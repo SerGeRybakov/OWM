@@ -1,8 +1,9 @@
 ## Настройка и запуск проекта
 coding: python 3.8.7 utf-8  
 1. pip install -r requirements.txt
-2. python database/models.py
-3. uvicorn main:app --reload --no-use-colors
+2. pre-commit install
+3. python database/models.py
+4. uvicorn main:app --reload --no-use-colors
 
 
 ## Задание

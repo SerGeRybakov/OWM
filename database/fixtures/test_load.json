@@ -1,0 +1,44 @@
+[
+  {
+    "model": "User",
+    "fields": {
+      "username": "testuser1",
+      "password": "Qwerty123_"
+    }
+  },
+  {
+    "model": "User",
+    "fields": {
+      "username": "testuser2",
+      "password": "Qwerty123-"
+    }
+  },
+  {
+    "model": "Object",
+    "fields": {
+      "title": "object1-1",
+      "user_id": 1
+    }
+  },
+  {
+    "model": "Object",
+    "fields": {
+      "title": "object1-2",
+      "user_id": 1
+    }
+  },
+  {
+    "model": "Object",
+    "fields": {
+      "title": "object2-1",
+      "user_id": 2
+    }
+  },
+  {
+    "model": "Object",
+    "fields": {
+      "title": "object2-2",
+      "user_id": 2
+    }
+  }
+]

@@ -15,7 +15,7 @@ async def test_main_function(engine, session: AsyncSession, title, user_id):
     """Test database is created and primary inserts are done."""
     with patch("database.models.engine", engine):
         with patch("database.models.session", session) as session:
-            await main()
+            await main(test=True)
 
     async with session:
         query = select(Object).where(Object.title == title)

@@ -68,16 +68,16 @@ class UserToken(Base):
     user_id = Column(Integer, ForeignKey("user.id"), primary_key=True, nullable=False, unique=True)
 
 
-async def main():
+async def main(test: bool = False):
     """Create database and fill it with basic inserts."""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
     table_to_model_mapping = {"User": User, "Object": Object}
-
-    with open(os.path.join(os.path.dirname(__file__), "initial_load.json"), "r", encoding="utf-8") as file:
-        load = [table_to_model_mapping[dic["model"]](**dic["fields"]) for dic in json.load(file)]
+    filename = "initial_load.json" if not test else "test_load.json"
+    with open(os.path.join(os.path.dirname(__file__), "fixtures", filename), "r", encoding="utf-8") as f:
+        load = [table_to_model_mapping[dic["model"]](**dic["fields"]) for dic in json.load(f)]
 
     async with session:
         for model in load:

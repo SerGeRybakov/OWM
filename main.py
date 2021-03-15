@@ -1,12 +1,27 @@
 """Main module."""
+from functools import lru_cache
+
 import uvicorn
-from fastapi import FastAPI, APIRouter
-from views import login_router
+from fastapi import Depends, FastAPI, APIRouter
+from views import *
+from config import Settings
 
 app = FastAPI()
+
+
+@lru_cache()
+def get_settings():
+    """Initiate app settings."""
+    return Settings()
+
+
+settings: Settings = Depends(get_settings)
+
 root_router = APIRouter(prefix="/api/v1")
 
 root_router.include_router(login_router)
+root_router.include_router(users_list_router)
+root_router.include_router(reg_router)
 
 app.include_router(root_router)
 
