@@ -1,4 +1,4 @@
-"""View for list of users."""
+"""View for users register."""
 from fastapi import APIRouter, HTTPException
 
 from database.engine import session

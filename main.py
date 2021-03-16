@@ -3,7 +3,7 @@ from functools import lru_cache
 
 import uvicorn
 from fastapi import Depends, FastAPI, APIRouter
-from views import *
+from views import reg_router, login_router, users_list_router
 from config import Settings
 
 app = FastAPI()
