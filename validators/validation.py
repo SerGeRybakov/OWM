@@ -1,10 +1,13 @@
-"""Validators."""
+"""Username and password validators."""
 
 import re
-from database.engine import session
+
 from sqlalchemy import select
 
+from database.engine import session
 from database.models import User
+
+__all__ = ["ValidationError", "validate"]
 
 
 class ValidationError(Exception):
@@ -13,10 +16,10 @@ class ValidationError(Exception):
     pass
 
 
-async def __validate(creds):
+async def __validate(credentials):
     """Starts validation."""
-    username = creds.username
-    password = creds.password
+    username = credentials.username
+    password = credentials.password
     try:
         await __validate_username(username)
         await __validate_password(password)
@@ -32,7 +35,7 @@ async def __validate_username(username):
         result = await session.execute(query)
     user = result.scalars().first()
     if user:
-        raise ValueError(f"Username '{username}' has already been registered by another user")
+        raise ValueError(f"Username '{username}' has been already registered by another user")
     return True
 
 
@@ -106,6 +109,3 @@ async def validate(credentials):
         return await __validate(credentials)
     except ValueError as e:
         raise ValidationError(e.args[0])
-
-
-__all__ = ["ValidationError", "validate"]

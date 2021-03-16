@@ -1,7 +1,7 @@
 """Models for mapping request data."""
 from pydantic.main import BaseModel
 
-__all__ = ["UserData"]
+__all__ = ["UserData", "ItemData"]
 
 
 class UserData(BaseModel):
@@ -9,3 +9,9 @@ class UserData(BaseModel):
 
     username: str
     password: str
+
+
+class ItemData(BaseModel):
+    """Map item data from request."""
+
+    title: str

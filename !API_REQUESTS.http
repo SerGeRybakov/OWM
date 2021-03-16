@@ -1,0 +1,52 @@
+# REGISTER
+POST http://localhost:8000/api/v1/register
+Accept: application/json
+Content-Type: application/json
+
+{
+  "username": "new_user",
+  "password": "Qwerty123!"
+}
+
+###
+
+# LOGIN
+POST http://localhost:8000/api/v1/login
+Accept: application/json
+Content-Type: application/json
+Authorization: Basic new_user Qwerty123!
+
+###
+
+# POST ONE NEW USER'S ITEM (TOKEN REQUIRED)
+POST http://localhost:8000/api/v1/items/new
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MywiZXhwIjoxNjE1OTMwNDE2fQ.IBWx-U1iDXVJuxxAQZm6u1W2u0wQ9Vsy3WxHDixIfLU
+
+{
+  "title": "new_awesome_item"
+}
+
+###
+
+# GET USER'S ITEMS LIST (TOKEN REQUIRED)
+GET http://localhost:8000/api/v1/items/
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MywiZXhwIjoxNjE1OTMwNDE2fQ.IBWx-U1iDXVJuxxAQZm6u1W2u0wQ9Vsy3WxHDixIfLU
+
+###
+
+# DELETE USER'S ITEMS LIST (TOKEN REQUIRED)
+DELETE http://localhost:8000/api/v1/items/:5
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MywiZXhwIjoxNjE1OTMwNDE2fQ.IBWx-U1iDXVJuxxAQZm6u1W2u0wQ9Vsy3WxHDixIfLU
+
+
+###
+
+# GET USERS LIST (TOKEN REQUIRED)
+GET http://localhost:8000/api/v1/users
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MywiZXhwIjoxNjE1OTMwNDE2fQ.IBWx-U1iDXVJuxxAQZm6u1W2u0wQ9Vsy3WxHDixIfLU

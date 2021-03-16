@@ -2,9 +2,10 @@
 coding: python 3.8.7 utf-8  
 1. pip install -r requirements.txt
 2. pre-commit install
-3. python database/models.py
+3. запустить файл database/models.py
 4. uvicorn main:app --reload --no-use-colors
 
+---
 
 ## Задание
 1. Реализовать API для регистрации пользователя: логин, пароль.  Логин и 
