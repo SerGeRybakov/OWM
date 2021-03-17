@@ -105,7 +105,7 @@ async def validate(credentials):
     """Validate new user's credentials."""
     try:
         if credentials is None or not credentials.username or not credentials.password:
-            raise ValueError()
+            raise ValueError("Both username and password required")
         return await __validate(credentials)
     except ValueError as e:
         raise ValidationError(e.args[0])

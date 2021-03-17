@@ -7,6 +7,7 @@ import os
 from passlib.context import CryptContext
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.future import select
 
 from database.engine import engine, session
 
@@ -41,9 +42,9 @@ class User(Base):
 
 
 class Item(Base):
-    """Table for storing objects.
+    """Table for storing items.
 
-    One object can be bound to one user only.
+    One item can be bound to one user only.
     """
 
     __tablename__ = "item"

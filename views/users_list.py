@@ -14,8 +14,8 @@ router = APIRouter(tags=["users"])
 async def users_list(current_user: User = Depends(get_current_user)):
     """Get list of users' usernames.
 
-    With aim to forward an object to any other user
-    one should know the exact username of the object-achiever.
+    With aim to forward an item to any other user
+    one should know the exact username of the achiever.
     """
     if current_user:
         async with session:

@@ -20,18 +20,23 @@ async def login(current_user: User = Depends(authenticate_user), settings: Setti
 
     Return token
     """
-    expiry = datetime.datetime.utcnow() + datetime.timedelta(minutes=100)
-    token = jwt.encode({"id": current_user.id, "exp": expiry}, settings.SECRET_KEY)
+    access_token = create_access_token(current_user.id, settings.SECRET_KEY, {"minutes": 3600})
 
     async with session:
         query = select(UserToken).where(UserToken.user_id == current_user.id)
         result = await session.execute(query)
         user_token: UserToken = result.scalars().first()
         if user_token:
-            user_token.token = token
+            user_token.token = access_token
         else:
-            user_token = UserToken(user_id=current_user.id, token=token)
+            user_token = UserToken(user_id=current_user.id, token=access_token)
             session.add(user_token)
         await session.commit()
 
-    return {"token": token}
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
+def create_access_token(user_id: int, key: str, expiry_time: dict) -> str:
+    """Create an access token."""
+    expiry = datetime.datetime.utcnow() + datetime.timedelta(**expiry_time)
+    return jwt.encode({"id": user_id, "exp": expiry}, key)

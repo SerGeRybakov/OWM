@@ -4,12 +4,12 @@ from fastapi import APIRouter, HTTPException
 from database.engine import session
 from database.models import User
 from validators.validation import ValidationError, validate
-from database.data_models import UserData
+from database.schemas import UserData
 
-router = APIRouter(tags=["register"])
+router = APIRouter(tags=["registration"])
 
 
-@router.post("/register", status_code=201)
+@router.post("/registration", status_code=201)
 async def register_user(data: UserData):
     """New user registration.
 
@@ -24,4 +24,4 @@ async def register_user(data: UserData):
     async with session:
         session.add(user)
         await session.commit()
-    return {"message": "User was successfully created"}
+        return {"message": f"User {user.username} was successfully registered"}

@@ -13,6 +13,7 @@ root_router.include_router(reg_router)
 root_router.include_router(login_router)
 root_router.include_router(items_router)
 root_router.include_router(users_list_router)
+root_router.include_router(exchange_router)
 
 app.include_router(root_router)
 
