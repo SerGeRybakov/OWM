@@ -11,7 +11,7 @@ coding: python 3.8.7 utf-8
 
 Стек:
 - FastAPI
-- SQLAlchemy 1.4.2b0
+- SQLAlchemy 1.4.0b2
 - SQLite
 - black.
 - flake8
