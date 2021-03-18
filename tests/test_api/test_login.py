@@ -1,13 +1,11 @@
 """Test login view."""
+import time
+from random import randint
 from unittest.mock import patch
 
-from sqlalchemy.future import select
-
-from config import get_settings
 import pytest
 
-from database.models import User, UserToken
-from validators.authentication import decode_token
+from config import get_settings
 
 settings = get_settings()
 
@@ -22,21 +20,41 @@ def test_normal_logging_in(test_client, test_session):
             assert response.json()["access_token"]
 
 
-#
-# @pytest.mark.asyncio
-# async def test_token_stored_in_database(test_client, test_session):
-#     """Test token was stored in database."""
-#     with patch("validators.authentication.session", test_session):
-#         with patch("views.login.session", test_session):
-#             payload = {'username': "testuser1",
-#                        "password": "Qwerty123_"}
-#             response = test_client.post('api/v1/login', data=payload).json()
-#             token = response['access_token']
-#             payload = decode_token(token, settings.SECRET_KEY)
-#             async with test_session:
-#                 query = select(UserToken.token).where(UserToken.user_id == payload['id'])
-#                 result = await test_session.execute(query)
-#                 assert result.scalars().first()
+def test_twice_logging_in(test_client, test_session):
+    """Test twice successful login but tokens differ."""
+    tokens = []
+    for _ in range(2):
+        with patch("validators.authentication.session", test_session):
+            with patch("views.login.session", test_session):
+                payload = {"username": "testuser1", "password": "Qwerty123_"}
+                response = test_client.post("api/v1/login", data=payload)
+                assert response.status_code == 200
+        tokens.append(response.json()["access_token"])
+        time.sleep(1)
+    assert tokens[0] != tokens[1]
+
+
+def test_only_last_token_is_valid(test_client, test_session):
+    """Test only the last obtained token is valid."""
+    tokens = []
+    for _ in range(randint(2, 10)):
+        with patch("validators.authentication.session", test_session):
+            with patch("views.login.session", test_session):
+                payload = {"username": "testuser1", "password": "Qwerty123_"}
+                response1 = test_client.post("api/v1/login", data=payload)
+                tokens.append(response1.json()["access_token"])
+        time.sleep(1)
+
+    status_codes = []
+    for token in tokens:
+        with patch("validators.authentication.session", test_session):
+            with patch("views.items.session", test_session):
+                headers = {"Authorization": f"Bearer {token}"}
+                response = test_client.get("/api/v1/items", headers=headers)
+                status_codes.append(response.status_code)
+    last_code = status_codes.pop()
+    assert last_code == 200
+    assert set(status_codes) == {401}
 
 
 @pytest.mark.parametrize(("username", "code"), [("", 422), (" ", 401), ("user1", 401), (1, 401)])

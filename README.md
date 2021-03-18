@@ -13,9 +13,9 @@ coding: python 3.8.7 utf-8
 - FastAPI
 - SQLAlchemy 1.4.2b0
 - SQLite
-- PyTest
 - black.
 - flake8
+- PyTest ([Покрытие тестами](tests/htmlcov/index.html) - 98%)
 
 ---
 

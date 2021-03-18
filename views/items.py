@@ -71,24 +71,33 @@ async def delete_item(item_id: int, current_user: User = Depends(get_current_use
 async def send_item(
     data: TransferData, current_user: User = Depends(get_current_user), settings: Settings = Depends(get_settings)
 ):
-    """Create a link and a token for transfer and item to a certain user."""
+    """Create a link and a token for transfer an item to a certain user."""
     async with session:
         query = select(User.id).where(User.username == data.achiever)
         result = await session.execute(query)
-    user = result.scalars().first()
-    token = generate_exchange_token(user, data.item_id, settings.SECRET_KEY)
-    return {"link": f"/api/v1/get?transfer_key={token}"}
+        user = result.scalars().first()
+        query = select(Item.id).where(Item.id == data.item_id)
+        result = await session.execute(query)
+        item_ = result.scalars().first()
+    if user and user != current_user.id and item_:
+        token = generate_exchange_token(user, data.item_id, settings.SECRET_KEY)
+        return {"link": f"/api/v1/get?transfer_key={token}"}
+    raise HTTPException(status_code=400, detail="Invalid data in request payload")
 
 
 @exchange_router.get("/get")
 async def get_item_by_achiever(
     transfer_key: str = None, current_user: User = Depends(get_current_user), settings: Settings = Depends(get_settings)
 ):
-    """Create a link and a token for transfer and item to a certain user."""
+    """Obtain an item by the user encoded in the link-token."""
     if not transfer_key:
         raise HTTPException(status_code=404)
 
     transfer_data = decode_token(transfer_key, settings.SECRET_KEY)
+
+    if not transfer_data.get("achiever_id"):
+        raise HTTPException(status_code=400, detail="Invalid key")
+
     if transfer_data["achiever_id"] != current_user.id:
         raise HTTPException(status_code=403, detail="Sorry, this link isn't for you")
 
