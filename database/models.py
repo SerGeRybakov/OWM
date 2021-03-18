@@ -7,6 +7,7 @@ import os
 from passlib.context import CryptContext
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.future import select
 
 from database.engine import engine, session
 
@@ -29,22 +30,24 @@ class User(Base):
         self.username = username
         self.password = self.get_password_hash(password)
 
-    @staticmethod
-    def verify_password(plain_password, hashed_password):
-        return pwd_context.verify(plain_password, hashed_password)
+    def __repr__(self):
+        return f"{__class__.__name__}({self.username})"
+
+    def verify_password(self, plain_password):
+        return pwd_context.verify(plain_password, self.password)
 
     @staticmethod
     def get_password_hash(password):
         return pwd_context.hash(password)
 
 
-class Object(Base):
-    """Table for storing objects.
+class Item(Base):
+    """Table for storing items.
 
-    One object can be bound to one user only.
+    One item can be bound to one user only.
     """
 
-    __tablename__ = "object"
+    __tablename__ = "item"
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String(255), nullable=False)
     user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
@@ -67,17 +70,21 @@ class UserToken(Base):
     token = Column(String(255), primary_key=True, nullable=False)
     user_id = Column(Integer, ForeignKey("user.id"), primary_key=True, nullable=False, unique=True)
 
+    def __init__(self, token: str, user_id: int):
+        self.token = token
+        self.user_id = user_id
 
-async def main():
+
+async def main(test: bool = False):
     """Create database and fill it with basic inserts."""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
-    table_to_model_mapping = {"User": User, "Object": Object}
-
-    with open(os.path.join(os.path.dirname(__file__), "initial_load.json"), "r", encoding="utf-8") as file:
-        load = [table_to_model_mapping[dic["model"]](**dic["fields"]) for dic in json.load(file)]
+    table_to_model_mapping = {"User": User, "Item": Item}
+    filename = "initial_load.json" if not test else "test_load.json"
+    with open(os.path.join(os.path.dirname(__file__), "fixtures", filename), "r", encoding="utf-8") as f:
+        load = [table_to_model_mapping[dic["model"]](**dic["fields"]) for dic in json.load(f)]
 
     async with session:
         for model in load:

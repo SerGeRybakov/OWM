@@ -1,0 +1,44 @@
+[
+  {
+    "model": "User",
+    "fields": {
+      "username": "testuser1",
+      "password": "Qwerty123_"
+    }
+  },
+  {
+    "model": "User",
+    "fields": {
+      "username": "testuser2",
+      "password": "Qwerty123-"
+    }
+  },
+  {
+    "model": "Item",
+    "fields": {
+      "title": "item1-1",
+      "user_id": 1
+    }
+  },
+  {
+    "model": "Item",
+    "fields": {
+      "title": "item1-2",
+      "user_id": 1
+    }
+  },
+  {
+    "model": "Item",
+    "fields": {
+      "title": "item2-1",
+      "user_id": 2
+    }
+  },
+  {
+    "model": "Item",
+    "fields": {
+      "title": "item2-2",
+      "user_id": 2
+    }
+  }
+]
