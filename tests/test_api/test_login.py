@@ -69,7 +69,7 @@ def test_wrong_username(test_client, test_session, username, code):
 
 @pytest.mark.parametrize(("password", "code"), [("", 422), (" ", 401), ("qwerty123_", 401), (1, 401)])
 def test_wrong_password(test_client, test_session, password, code):
-    """Test login with wrong username."""
+    """Test login with wrong password."""
     with patch("validators.authentication.session", test_session):
         with patch("views.login.session", test_session):
             payload = {"username": "testuser1", "password": password}
