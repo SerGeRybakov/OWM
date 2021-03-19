@@ -78,7 +78,7 @@ def test_wrong_password(test_client, test_session, password, code):
 
 
 def test_no_credentials(test_client, test_session):
-    """Test login with wrong username."""
+    """Test login with empty credentials."""
     with patch("validators.authentication.session", test_session):
         with patch("views.login.session", test_session):
             payload = {"username": "", "password": ""}
