@@ -52,7 +52,7 @@ async def create_new_item(item: ItemData, current_user: User = Depends(get_curre
         return {"message": "Item was successfully created", "item": item}
 
 
-@items_router.delete("/:{item_id}", status_code=200)
+@items_router.delete("/:{item_id}", status_code=200)  # Actually it should return 204, but we need to return a message
 async def delete_item(item_id: int, current_user: User = Depends(get_current_user)):
     """Delete an item by its id."""
     if current_user:
@@ -105,6 +105,8 @@ async def get_item_by_achiever(
         query = select(Item).where(Item.id == transfer_data["item_id"])
         result = await session.execute(query)
         item: Item = result.scalars().first()
+        if item.user_id == current_user.id:
+            raise HTTPException(status_code=400, detail=f"Item {item.title} is already yours")
         item.user_id = transfer_data["achiever_id"]
         await session.commit()
         return {"message": f"You've just obtained {item.title}"}

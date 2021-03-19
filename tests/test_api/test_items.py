@@ -193,6 +193,24 @@ class TestExchange:
                 assert response.json()["message"] == "You've just obtained item1-1"
 
     @staticmethod
+    def test_get_item_transfer_twice(test_client, test_session, exchange_link):
+        """Test one item can't be obtained more than once."""
+        # login testuser2 and get his access_token
+        with patch("validators.authentication.session", test_session):
+            with patch("views.login.session", test_session):
+                payload = {"username": "testuser2", "password": "Qwerty123-"}
+                response = test_client.post("api/v1/login", data=payload).json()
+        token = response["access_token"]
+
+        for _ in range(2):
+            with patch("validators.authentication.session", test_session):
+                with patch("views.items.session", test_session):
+                    headers = {"Authorization": f"Bearer {token}"}
+                    response = test_client.get(exchange_link, headers=headers)
+        assert response.status_code == 400
+        assert response.json()["detail"] == "Item item1-1 is already yours"
+
+    @staticmethod
     def test_get_item_transfer_fail(test_client, test_session, exchange_link, token):
         """Test a fail of item transfer due to wrong user opened a link for someone else."""
         # testuser1 follows the link made for testuser2
