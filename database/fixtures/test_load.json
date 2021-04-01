@@ -14,6 +14,13 @@
     }
   },
   {
+    "model": "User",
+    "fields": {
+      "username": "testuser3",
+      "password": "Qwerty123_"
+    }
+  },
+  {
     "model": "Item",
     "fields": {
       "title": "item1-1",

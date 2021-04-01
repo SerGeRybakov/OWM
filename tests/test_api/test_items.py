@@ -10,6 +10,19 @@ from views.login import create_access_token
 settings = get_settings()
 
 
+@pytest.fixture()
+def exchange_link2(test_client, test_session, token):
+    """Create an exchange link to move item 1-1 from testuser1 to testuser3."""
+    with patch("validators.authentication.session", test_session):
+        with patch("views.items.session", test_session):
+            headers = {"Authorization": f"Bearer {token}"}
+            transfer_data = {"item_id": 1, "achiever": "testuser3"}
+            payload = json.dumps(transfer_data)
+            response = test_client.post("/api/v1/send", headers=headers, data=payload)
+            yield response.json()["link"]
+            del response.json()["link"]
+
+
 class TestGetItems:
     """Test the work of users' items list get method."""
 
@@ -191,6 +204,38 @@ class TestExchange:
                 response = test_client.get(exchange_link, headers=headers)
                 assert response.status_code == 200
                 assert response.json()["message"] == "You've just obtained item1-1"
+
+    @staticmethod
+    def test_get_item_transfer_with_2_valid_keys(test_client, test_session, exchange_link, exchange_link2, token):
+        """Test two valid keys for one item."""
+        # login testuser2 and get his access_token
+        with patch("validators.authentication.session", test_session):
+            with patch("views.login.session", test_session):
+                payload = {"username": "testuser2", "password": "Qwerty123-"}
+                response = test_client.post("api/v1/login", data=payload).json()
+        token = response["access_token"]
+
+        # testuser2 follows the link to obtain item1-1
+        with patch("validators.authentication.session", test_session):
+            with patch("views.items.session", test_session):
+                headers = {"Authorization": f"Bearer {token}"}
+                test_client.get(exchange_link, headers=headers)
+
+        # login testuser3 and get his access_token
+        with patch("validators.authentication.session", test_session):
+            with patch("views.login.session", test_session):
+                payload = {"username": "testuser3", "password": "Qwerty123_"}
+                response = test_client.post("api/v1/login", data=payload).json()
+        token = response["access_token"]
+
+        # testuser3 follows the link to obtain item1-1
+        with patch("validators.authentication.session", test_session):
+            with patch("views.items.session", test_session):
+                headers = {"Authorization": f"Bearer {token}"}
+                response = test_client.get(exchange_link2, headers=headers)
+                print(response.json())
+                assert response.status_code == 400
+                assert response.json()["detail"] == "Item item1-1 was already passed to another user"
 
     @staticmethod
     def test_get_item_transfer_twice(test_client, test_session, exchange_link):

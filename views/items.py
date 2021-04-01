@@ -80,7 +80,7 @@ async def send_item(
         result = await session.execute(query)
         item_ = result.scalars().first()
     if user and user != current_user.id and item_:
-        token = generate_exchange_token(user, data.item_id, settings.SECRET_KEY)
+        token = generate_exchange_token(current_user.id, user, data.item_id, settings.SECRET_KEY)
         return {"link": f"/api/v1/get?transfer_key={token}"}
     raise HTTPException(status_code=400, detail="Invalid data in request payload")
 
@@ -107,11 +107,13 @@ async def get_item_by_achiever(
         item: Item = result.scalars().first()
         if item.user_id == current_user.id:
             raise HTTPException(status_code=400, detail=f"Item {item.title} is already yours")
+        if item.user_id != transfer_data["owner_id"]:
+            raise HTTPException(status_code=400, detail=f"Item {item.title} was already passed to another user")
         item.user_id = transfer_data["achiever_id"]
         await session.commit()
         return {"message": f"You've just obtained {item.title}"}
 
 
-def generate_exchange_token(achiever: int, item_id: int, key: str):
+def generate_exchange_token(owner: int, achiever: int, item_id: int, key: str):
     """Generate token for item transfer."""
-    return jwt.encode({"achiever_id": achiever, "item_id": item_id}, key)
+    return jwt.encode({"owner_id": owner, "achiever_id": achiever, "item_id": item_id}, key)
